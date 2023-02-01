@@ -11,6 +11,7 @@ import com.spring.board.BoardService;
 public class Client_Test_getBoardList {
 
 	public static void main(String[] args) {
+		// Board의 값을 가져오는곳
 
 		AbstractApplicationContext factory = 
 				new GenericXmlApplicationContext("applicationContext.xml");

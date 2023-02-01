@@ -72,6 +72,7 @@ public class BoardDAO {
 		try {
 			//객체 생성
 			conn = JDBCUtil.getConnection(); 
+			//BOARD_UPDATE = "update board set title=?, content=? where seq=?"; 
 			pstmt = conn.prepareStatement(BOARD_UPDATE); 
 			
 			//pstmt 의 ? 에 dto에서 넘어오는 변수값 할당. 
@@ -99,6 +100,7 @@ public class BoardDAO {
 		
 		try {
 			conn = JDBCUtil.getConnection(); 
+			//BOARD_DELETE ="delete board where seq=?"; 
 			pstmt = conn.prepareStatement(BOARD_DELETE); 
 			pstmt.setInt(1, dto.getSeq());
 			
@@ -125,6 +127,7 @@ public class BoardDAO {
 		try {
 			//객체 생성 : Connection, PreparedStatement
 			conn = JDBCUtil.getConnection(); 
+			// BOARD_GET ="select * from board where seq=?";
 			pstmt = conn.prepareStatement(BOARD_GET); 
 			pstmt.setInt(1, dto.getSeq());
 			
@@ -157,10 +160,13 @@ public class BoardDAO {
 		return board; 
 	}
 	
-	//3-3. 글 목록 처리 메소드: getBoardList() : 많은 레코드 
+	//3-5. 글 목록 처리 메소드: getBoardList() : 많은 레코드 
 		// 
 	
-	public List<BoardDTO> getBoardList(BoardDTO dto) {
+	public List<BoardDTO> getBoardList(BoardDTO dto) {	//레코드의 값을 dto에 담는다.
+			//
+			// db의 레코드의 값이 담긴 dto를 List가 리턴받아 List에 담긴다.
+		
 		System.out.println("==> JDBC로 getBoardList() 기능처리 - 시작");
 		
 		//리턴 돌려줄 변수 선언 : List <= 인터페이스 , 
@@ -170,18 +176,26 @@ public class BoardDAO {
 				//LinkedList : 자주 수정, 삭제시 성능이 빠르게 처리됨 
 		
 		List<BoardDTO> boardList = new ArrayList<BoardDTO>(); 
-		BoardDTO board ; 
+		//BoardDTO board = new BoardDTO();
+		// 아래처럼 선언만 하자
+		BoardDTO board ;
 		
 		try {
-			conn = JDBCUtil.getConnection(); 
-			pstmt = conn.prepareStatement(BOARD_LIST); 
+			conn = JDBCUtil.getConnection();
+			
+			// BOARD_LIST ="select * from board order by seq desc";
+			pstmt = conn.prepareStatement(BOARD_LIST);
 			
 			rs = pstmt.executeQuery(); 
 			
 			if (rs.next()) {
 				do {
+					//주소값이 같아지기 때문에 객체를 다시 만들어야한다.
+					//**DTO 객체는 여기서 만들어야한다. (그래야 별도의 객체에 값이 담기게 된다.)
+					// 밖에서 선언하면 마지막에 들어간 것이 출력된다.
 					board = new BoardDTO();
-					//rs에서 가져온 1개의 레코드를 board (DTO) 
+					
+					//rs에서 가져온 1개의 레코드를 board (DTO) (setter 주입)
 					board.setSeq(rs.getInt("SEQ"));
 					board.setTitle(rs.getString("TITLE"));
 					board.setWriter(rs.getString("WRITER"));

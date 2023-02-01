@@ -20,7 +20,7 @@ public class JDBCUtil {
 		
 		try {
 			Class.forName(driver); 
-			conn = DriverManager.getConnection(url,"C##HR","1234");
+			conn = DriverManager.getConnection(url,"C##HR3","1234");
 			//conn = DriverManager.getConnection(url,"sa","");
 			
 			System.out.println(" DB에 잘 연결 되었습니다. ");   //확인후 주석 처리 

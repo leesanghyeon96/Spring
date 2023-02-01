@@ -1,14 +1,18 @@
 package com.spring.controller;
 
 import java.io.IOException;
+import java.util.List;
+
 import javax.servlet.ServletException;
 //import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.spring.board.BoardDAO;
 import com.spring.board.BoardDTO;
 import com.spring.users.UserDAO;
 import com.spring.users.UserDTO;
@@ -101,16 +105,141 @@ public class DispatcherServlet extends HttpServlet {
 					
 			
 		}else if (path.equals("/getBoardList.do")) {
-			
 			System.out.println("게시판 정보 출력 ");
+			
+			//1. Client로 부터 /getBOardList.do 요청을 받음. (게시판 정보를 출력해 달라고 요청)
+			
+			//2. 비즈니스 로직 처리
+			BoardDTO dto = new BoardDTO();
+			BoardDAO dao = new BoardDAO();
+			
+			//dao에 요청정보를 전송
+			// Java.util 의 list를 import
+			List<BoardDTO> boardList = dao.getBoardList(dto);
+				//boardList에는 DB에서 select한 레코드를 담은 DTO객체가 내장되어 있다.
+			
+			//3. 클라이언트에게 boardList를 전달해야한다.
+			//(세션 객체에 boardList 객체를 담아서 전송 시킴
+			// 세션은 서버의 RAM에 저장됨.
+			// 쿠키 : 클라이언트 시스템의 HDD에 정보를 저장
+			HttpSession session = request.getSession();
+				//HttpSession -> javax로 임포트
+			//setAttribute : session 객체에 값을 저장, setAttribute("변수명", 객체);
+				//String으로 담긴다.
+			//getAttribute : session 객체에 값을 가지고올때, getAttribute("변수명");
+			session.setAttribute("boardList", boardList);
+			
+			//4. 뷰페이지로 이동.
+				//response객체 : 서버에서 클라이언트에게 정보를 전달
+				//request객체 : 클라이언트 정보를 읽어오는 객체
+			response.sendRedirect("getBoardList.jsp");
+				//아래의 src - main - webapp - WEB-INF - getBoardList.jsp
+			
+			
+		}else if (path.equals("/insertBoard.do")) {
+			System.out.println("board 테이블의 값을 저장");
+			//1. 클라이언트에서 넘어오는 변수 값을 받아서 새로운 변수에 저장
+			String title = request.getParameter("title");
+			String write = request.getParameter("write");
+			String content = request.getParameter("content");
+			
+			//2. 비즈니스 로직 처리 (클라이언트의 변수를 dto에 저장 후 dao의 insertBoard(dto)
+			BoardDTO dto = new BoardDTO();
+			BoardDAO dao = new BoardDAO();
+			
+				//dto 의 setter 메소드 호출시 클라이언트에게 넘어오는 변수를 할당.
+			dto.setTitle(title);
+			dto.setWriter(write);
+			dto.setContent(content);
+			
+				//백엔드 로직 처리
+			dao.insertBoard(dto);	//DB에 Insert/ Update/ delete(는 리턴값이 필요없다.)가 완료됨
+			
+			//3. View 페이지를 전송
+			response.sendRedirect("getBoardList.do");
+			
+		
+		}else if (path.equals("/getBoard.do")) {
+			System.out.println("게시판 상세내용 보기 - /getBoard.do 요청함");
+		
+			//1. 클라이언트의 넘긴 변수 값 받기 ("seq")
+			String seq = request.getParameter("seq");	//getParameter 로 넘어오는 값은 모두 String
+			System.out.println("seq 변수값 : " + seq);
+			
+			//2. 비즈니스 로직 처리 : 파라미터로 받은 값을 DTO에 저장 후 getBoard(dto) 메소드 호출
+			BoardDTO dto = new BoardDTO();
+			BoardDAO dao = new BoardDAO();
+			
+			//클라이언트에서 받은 값을 dto에 setter 주입
+			dto.setSeq(Integer.parseInt(seq));	//seq는 int형식이므로 int로 변환
+			
+			//리턴을 받아온다.
+			BoardDTO board = dao.getBoard(dto);	//list가 아니라 그냥dto이다.
+			
+			//DB의 값이 저장된 DTO (board)를 session 변수에 할당해서 뷰 페이지로 전달
+			HttpSession session = request.getSession();
+			
+			session.setAttribute("board", board);
+			
+			//3. 뷰 페이지로 전달 (forward로 보내줄 수 있다.)
+			response.sendRedirect("getBoard.jsp");
+			
+			
+			
+			
+			
+		
+		}else if (path.equals("/updateBoard.do")) {
+			System.out.println("글 수정 처리");
+			
+			//1. 클라이언트에서 넘어오는 변수를 받음.
+			String title = request.getParameter("title");
+			String content = request.getParameter("content");
+			String seq = request.getParameter("seq");
+			/*
+			변수가 잘 넘어오는지 확인 (디버깅)
+			System.out.println(seq);
+			System.out.println(title);
+			System.out.println(content);
+			*/
+			
+			//2. DTO, DAO 객체를 사용해서 비즈니스 로직 처리
+			BoardDTO dto = new BoardDTO();
+			BoardDAO dao = new BoardDAO();
+			
+			dto.setSeq(Integer.parseInt(seq));
+			dto.setTitle(title);
+			dto.setContent(content);
+			
+			dao.updateBoard(dto);
+			
+			//3. 백엔드의 로직을 모두 처리후 client 에게 View 페이지로 이동
+			response.sendRedirect("getBoardList.do");
+			
+			
+			
+		}else if (path.equals("/deleteBoard.do")) {
+			System.out.println("글 삭제 처리");
+			
+			//1. 클라이언트에서 넘긴 seq를 받아서 변수에 저장함.
+			String seq = request.getParameter("seq");
+			
+			//2. DTO, DAO에 로직 처리 (백엔드의 비즈니스 로직 처리)
+			BoardDTO dto = new BoardDTO();
+			BoardDAO dao = new BoardDAO();
+			
+			dto.setSeq(Integer.parseInt(seq));
+			
+			dao.deleteBoard(dto);
+			
+			//3. 비즈니스 로직 처리 완료후 View 페이지로 이동
+			response.sendRedirect("getBoardList.do");
 			
 			
 			
 		}else if (path.equals("/logout.do")) {
-			
 			System.out.println("사용자 로그 아웃 처리");
 		}
-		
 		
 	}
 	

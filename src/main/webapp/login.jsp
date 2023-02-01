@@ -12,7 +12,7 @@
 	<h1> 로그인 폼</h1>
 	<hr> 
 	
-	<form action = "login.do" method="post"> 
+	<form action = "getBoardList.do" method="post"> 
 		<table border="1" cellspacing="0" cellpadding="0">
 			<tr><td bgcolor="orange">아이디 : </td>
 				<td><input type="text" name="id"></td>
