@@ -43,7 +43,7 @@ public class UserDAO  {
 			
 			if (rs.next()){		//레코드의 값이 존재할때 커서를 해당 레코드로 이동 
 				
-				System.out.println("DB에서 값이 잘 select 되었습니다.  " );
+				System.out.println("DB에서 값이 잘 select 되었습니다.");
 				
 				user.setId(rs.getString("ID"));
 				user.setPassword(rs.getString("PASSWORD"));

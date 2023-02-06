@@ -75,8 +75,8 @@ public class DispatcherServlet extends HttpServlet {
 			String id = request.getParameter("id"); 
 			String password = request.getParameter("password"); 
 			
-			System.out.println("폼에서 넘긴 변수 id 갑 출력 : " + id);
-			System.out.println("폼에서 넘긴 변수 id 갑 출력 : " + password);
+			System.out.println("폼에서 넘긴 변수 id 값 출력 : " + id);
+			System.out.println("폼에서 넘긴 변수 id 값 출력 : " + password);
 			
 			//2. 클라이언트에서 넘긴 변수값을 받아서 저장된 변수를 DTO에 Setter 주입 
 			UserDTO dto = new UserDTO(); 
@@ -96,7 +96,7 @@ public class DispatcherServlet extends HttpServlet {
 			
 			//4. 백엔드의 로직을 모두 처리후 View 페이지로 이동 
 			if (userD.getId() != null) {  //클라이언트에게 전송한 ID 와 Pass가 DB의 값과 일치 할때
-				response.sendRedirect("getBoardList.jsp"); 
+				response.sendRedirect("getBoardList.do"); 
 				System.out.println("아이디와 패스워드 일치");
 			}else {  //Client에게 전송한 ID와 Pass중 일치하지 않을 때  
 				response.sendRedirect("login.jsp"); 
